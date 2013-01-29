@@ -80,14 +80,7 @@ class Url
             }
         }
 
-        if (empty($parts['path'])) {
-            $url .= '/';
-        } else {
-            if ($parts['path'][0] != '/') {
-                $url .= '/';
-            }
-            $url .= $parts['path'];
-        }
+        if (isset($parts['path'])) $url .= $parts['path'];
 
         // Add the query string if present
         if (!empty($parts['query'])) {
@@ -125,12 +118,9 @@ class Url
         $this->port = $port;
         $this->username = $username;
         $this->password = $password;
+        $this->setPath($path, false);
         $this->fragment = $fragment;
         $this->setQuery($query ?: new QueryString());
-
-        if ($path) {
-            $this->setPath($path);
-        }
     }
 
     /**
@@ -261,19 +251,24 @@ class Url
      * Set the path part of the URL
      *
      * @param array|string $path Path string or array of path segments
+     * @param boolean $treatAsAbsolute Should the path be treated as absolute even if it doesn't starts with a slash?
      *
      * @return Url
+     * @throws InvalidArgumentException
      */
-    public function setPath($path)
+    public function setPath($path, $treatAsAbsolute = true)
     {
-        if (is_array($path)) {
-            $this->path = '/' . implode('/', $path);
-        } else {
-            if (substr($path, 0, 1) != '/' && $path != '*') {
+        $path = is_array($path) ? implode('/', $path) : (string) $path;
+
+        if (substr($path, 0, 1) != '/' && $path != '*') {
+            if ($treatAsAbsolute || $this->isAbsolute() && $path === '') {
                 $path = '/' . $path;
+            } else if ($this->isAbsolute()) {
+                throw new \InvalidArgumentException("Cannot set a relative path to an absolute URL");
             }
-            $this->path = $path;
         }
+
+        $this->path = $path;
 
         return $this;
     }
@@ -355,7 +350,7 @@ class Url
      */
     public function getPath()
     {
-        return $this->path ?: '/';
+        return $this->path;
     }
 
     /**

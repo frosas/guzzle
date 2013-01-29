@@ -101,8 +101,8 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
 
         $parts = parse_url('http://www.test.com/test');
         $parts['path'] = '';
-        $this->assertEquals('http://www.test.com/', Url::buildUrl($parts));
-        $parts['path'] = 'test';
+        $this->assertEquals('http://www.test.com', Url::buildUrl($parts));
+        $parts['path'] = '/test';
         $this->assertEquals('http://www.test.com/test', Url::buildUrl($parts));
     }
 
@@ -111,7 +111,7 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
      */
     public function testAddsQueryStringIfPresent()
     {
-        $this->assertEquals('/?foo=bar', Url::buildUrl(array(
+        $this->assertEquals('?foo=bar', Url::buildUrl(array(
             'query' => 'foo=bar'
         )));
     }
