@@ -256,7 +256,7 @@ class Url
      */
     public function setPath($path)
     {
-        $path = is_array($path) ? implode('/', $path) : (string) $path;
+        if (is_array($path)) $path = implode('/', $path);
 
         if ($this->isAbsolute() && substr($path, 0, 1) != '/' && $path != '*') {
             $path = '/' . $path;
