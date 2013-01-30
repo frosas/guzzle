@@ -8,15 +8,6 @@ use Guzzle\Http\Url;
 class UrlTest extends \Guzzle\Tests\GuzzleTestCase
 {
     /**
-     *
-     */
-    public function testEmptyUrl()
-    {
-        $url = Url::factory("");
-        $this->assertEquals("", (string) $url);
-    }
-
-    /**
      * @covers Guzzle\Http\Url::getPort
      */
     public function testPortIsDeterminedFromScheme()
@@ -91,12 +82,14 @@ class UrlTest extends \Guzzle\Tests\GuzzleTestCase
      */
     public function testHandlesPathsCorrectly()
     {
-        $url = Url::factory('http://www.test.com');
-        $this->assertEquals('/', $url->getPath());
-        $url->setPath('test');
-        $this->assertEquals('/test', $url->getPath());
+        $this->assertEquals('', Url::factory('')->setPath('')->getPath());
+        $this->assertEquals('path', Url::factory('')->setPath('path')->getPath());
+        $this->assertEquals('/path', Url::factory('')->setPath('/path')->getPath());
+        $this->assertEquals('/', Url::factory('http://example.com')->setPath('')->getPath());
+        $this->assertEquals('/path', Url::factory('http://example.com')->setPath('path')->getPath());
+        $this->assertEquals('/path', Url::factory('http://example.com')->setPath('/path')->getPath());
 
-        $url->setPath('/test/123/abc');
+        $url = Url::factory('http://www.test.com')->setPath('/test/123/abc');
         $this->assertEquals(array('test', '123', 'abc'), $url->getPathSegments());
 
         $parts = parse_url('http://www.test.com/test');
