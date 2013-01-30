@@ -118,7 +118,7 @@ class Url
         $this->port = $port;
         $this->username = $username;
         $this->password = $password;
-        $this->setPath($path, false);
+        $this->setPath($path);
         $this->fragment = $fragment;
         $this->setQuery($query ?: new QueryString());
     }
@@ -251,21 +251,15 @@ class Url
      * Set the path part of the URL
      *
      * @param array|string $path Path string or array of path segments
-     * @param boolean $treatAsAbsolute Should the path be treated as absolute even if it doesn't starts with a slash?
      *
      * @return Url
-     * @throws InvalidArgumentException
      */
-    public function setPath($path, $treatAsAbsolute = true)
+    public function setPath($path)
     {
         $path = is_array($path) ? implode('/', $path) : (string) $path;
 
-        if (substr($path, 0, 1) != '/' && $path != '*') {
-            if ($treatAsAbsolute || $this->isAbsolute() && $path === '') {
-                $path = '/' . $path;
-            } else if ($this->isAbsolute()) {
-                throw new \InvalidArgumentException("Cannot set a relative path to an absolute URL");
-            }
+        if ($this->isAbsolute() && substr($path, 0, 1) != '/' && $path != '*') {
+            $path = '/' . $path;
         }
 
         $this->path = $path;
